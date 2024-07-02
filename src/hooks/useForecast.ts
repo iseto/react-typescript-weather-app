@@ -1,5 +1,5 @@
 import { useState, useEffect, ChangeEvent } from 'react'
-import optionType from '../types'
+import { optionType, forecastType } from '../types'
 
 const useForecast = () => {
   const [term, setTerm] = useState<string>('')
@@ -15,16 +15,23 @@ const useForecast = () => {
     )
       .then((res) => res.json())
       .then((data) => setOptions(data))
+      .catch((e) => console.log(e))
   }
 
   const getForecast = (city: optionType) => {
     fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${city.lat}&lon=${
         city.lon
       }&units=metric&appid=${import.meta.env.VITE_API_KEY}`
     )
       .then((res) => res.json())
-      .then((data) => setForecast(data))
+      .then((data) => {
+        const forecastData = {
+          ...data.city,
+          list: data.list.slice(0, 16), // forecast days
+        }
+        setForecast(forecastData)
+      })
   }
 
   const onSubmit = () => {
