@@ -14,7 +14,8 @@ const Suggestions = ({ options, onSelect }: componentProps): JSX.Element => {
             className="text-left text-sm w-full hover:bg-zinc-700 hover:text-white px-2 py-1 cursor-pointer"
             onClick={() => onSelect(option)}
           >
-            {option.name}
+            {option.name}, {option.state ? option.state + ', ' : ''}{' '}
+            {option.country}
           </button>
         </li>
       ))}

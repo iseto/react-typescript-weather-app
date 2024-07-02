@@ -15,6 +15,7 @@ const useForecast = () => {
     )
       .then((res) => res.json())
       .then((data) => setOptions(data))
+      .catch((e) => console.log(e))
   }
 
   const getForecast = (city: optionType) => {
