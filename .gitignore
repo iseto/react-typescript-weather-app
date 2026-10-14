@@ -11,7 +11,16 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
+# Local configuration and credentials
+.env*
+!.env.example
+.envrc
+.npmrc
+.netrc
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Editor directories and files
 .vscode/*
@@ -23,3 +32,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Browser test output
+playwright-report/
+test-results/
+blob-report/
+coverage/
+.cache/
+*.tsbuildinfo
+
+# Vercel project links and local deployment configuration
+.vercel/

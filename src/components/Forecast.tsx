@@ -1,121 +1,257 @@
 import {
-  getHumidityValue,
-  getPrecipitation,
-  getSunTime,
-  getWindDirection,
-} from '../helpers'
-import Sunrise from '../Icons/Sunrise'
-import Sunset from '../Icons/Sunset'
-import { forecastType } from '../types'
-import { Degree } from './Degree'
-import Tile from './Tile'
-
-type Props = {
-  data: forecastType
-}
-
-const Forecast = ({ data }: Props): JSX.Element => {
-  const today = data.list[0]
-
+  ArrowUpRight,
+  Droplets,
+  Wind,
+  Sun,
+  Sunrise,
+  Sunset,
+  Thermometer,
+  Clock3,
+} from 'lucide-react'
+import {
+  formatDay,
+  formatTime,
+  outdoorWindow,
+  temperature,
+  upcomingHours,
+  weatherLabel,
+  type Weather,
+} from '../lib/weather'
+import { WeatherIcon } from './WeatherIcon'
+export function Forecast({
+  weather: w,
+  unit,
+}: {
+  weather: Weather
+  unit: 'C' | 'F'
+}) {
+  const hours = upcomingHours(w)
+  const window = outdoorWindow(w)
+  const lows = w.daily.temperature_2m_min
+  const highs = w.daily.temperature_2m_max
+  const min = Math.min(...lows),
+    max = Math.max(...highs),
+    range = Math.max(max - min, 1)
   return (
-    <div className="w-full md:max-w-[500px] py-4 md:py-4 md:px-10 lg:px-24 h-full lg:h-auto bg-white bg-opacity-20 backdrop-blur-ls rounded drop-shadow-lg">
-      <div className="mx-auto w-[300px]">
-        <section className="text-center">
-          <h2 className="text-2xl font-black">
-            {data.name} <span className="font-thin">{data.country}</span>
-          </h2>
-          <h1 className="text-4xl font-extrabold">
-            <Degree temp={Math.round(today.main.temp)} />
-          </h1>
-          <p className="text-sm">
-            {today.weather[0].main}
-            {today.weather[0].description}
-          </p>
-          <p className="text-sm">
-            Highest : <Degree temp={Math.ceil(today.main.temp_max)} /> - Lowest
-            : <Degree temp={Math.floor(today.main.temp_min)} />
-          </p>
-        </section>
-
-        <section className="flex overflow-x-scroll mt-4 pb-2 mb-5">
-          {data.list.map((item, index) => (
-            <div
-              key={index}
-              className="inline-block text-center w-[50px] flex-shrink-0"
-            >
-              <p className="text-sm">
-                {index === 0 ? 'Now' : new Date(item.dt * 1000).getHours()}
-              </p>
-              <img
-                src={`http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
-                alt={`weather-icon-${item.weather[0].description}`}
-              />
-              <p className="text-sm font-bold">
-                <Degree temp={Math.round(item.main.temp)} />
-              </p>
+    <>
+      <section className="metrics" aria-label="Current weather details">
+        <div>
+          <span className="metric-label">
+            <Thermometer size={17} /> Feels like
+          </span>
+          <strong>
+            {temperature(w.current.apparent_temperature, unit)}
+            <span>°{unit}</span>
+          </strong>
+          <small>Your comfort, at a glance</small>
+        </div>
+        <div>
+          <span className="metric-label">
+            <Wind size={17} /> Wind
+          </span>
+          <strong>
+            {Math.round(w.current.wind_speed_10m)}
+            <span> km/h</span>
+          </strong>
+          <small>
+            {
+              ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][
+                Math.round(w.current.wind_direction_10m / 45) % 8
+              ]
+            }{' '}
+            · at 10 meters
+          </small>
+        </div>
+        <div>
+          <span className="metric-label">
+            <Droplets size={17} /> Humidity
+          </span>
+          <strong>
+            {w.current.relative_humidity_2m}
+            <span>%</span>
+          </strong>
+          <small>
+            {w.current.relative_humidity_2m > 70
+              ? 'A little moisture in the air'
+              : 'Relative humidity'}
+          </small>
+        </div>
+        <div>
+          <span className="metric-label">
+            <Sun size={17} /> UV index
+          </span>
+          <strong>
+            {w.daily.uv_index_max[0].toFixed(1)}
+            <span> / 11+</span>
+          </strong>
+          <small>
+            Daily peak ·{' '}
+            {w.daily.uv_index_max[0] < 3
+              ? 'Low'
+              : w.daily.uv_index_max[0] < 6
+                ? 'Moderate'
+                : w.daily.uv_index_max[0] < 8
+                  ? 'High'
+                  : 'Very high'}
+          </small>
+        </div>
+      </section>
+      <div className="forecast-grid">
+        <section className="panel hourly">
+          <div className="section-heading">
+            <h2>The next 24 hours</h2>
+            <span>Local time</span>
+          </div>
+          <div
+            className="hourly-scroll"
+            tabIndex={0}
+            aria-label="Hourly forecast, scroll for more hours"
+          >
+            <div className="hourly-columns">
+              {hours.map((h, i) => (
+                <div className={`hour ${i === 0 ? 'now' : ''}`} key={h.time}>
+                  <span>
+                    {i === 0 ? 'Now' : formatTime(h.time, w.timezone)}
+                  </span>
+                  <WeatherIcon code={h.code} day={h.day} />
+                  <strong>{temperature(h.temp, unit)}°</strong>
+                  <small>
+                    <Droplets size={11} />
+                    {h.rain}%
+                  </small>
+                  <span className="sr-only">{weatherLabel(h.code)}</span>
+                </div>
+              ))}
             </div>
-          ))}
+            <svg
+              className="temperature-curve"
+              viewBox={`0 0 ${hours.length * 76} 72`}
+              role="img"
+              aria-label="Hourly temperature trend"
+            >
+              <defs>
+                <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#9caf7a" stopOpacity=".18" />
+                  <stop offset="100%" stopColor="#9caf7a" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              {hours.length > 0 &&
+                (() => {
+                  const low = Math.min(...hours.map((h) => h.temp)),
+                    high = Math.max(...hours.map((h) => h.temp))
+                  const points = hours
+                    .map(
+                      (h, i) =>
+                        `${i * 76 + 38},${52 - ((h.temp - low) / Math.max(high - low, 1)) * 35}`
+                    )
+                    .join(' ')
+                  return (
+                    <>
+                      <polygon
+                        points={`38,72 ${points} ${hours.length * 76 - 38},72`}
+                        fill="url(#chart-fill)"
+                      />
+                      <polyline
+                        points={points}
+                        fill="none"
+                        stroke="#8b9f70"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                      />
+                    </>
+                  )
+                })()}
+            </svg>
+          </div>
+          <div className="panel-note">
+            <Droplets size={14} />
+            <span>Percentages show the chance of precipitation.</span>
+          </div>
         </section>
-
-        <section className="flex flex-wrap justify-between text-zinc-700">
-          <div className="w-[140px] text-xs font-bold flex flex-col items-center bg-white/20 backdrop-blur-ls rounded drop-shadow-lg py-4 mb-5">
-            <Sunrise />
-            <span className="mt-2">{getSunTime(data.sunrise)}</span>
+        <section className="panel weekly">
+          <div className="section-heading">
+            <h2>The week ahead</h2>
+            <span>7 days</span>
           </div>
-          <div className="w-[140px] text-xs font-bold flex flex-col items-center bg-white/20 backdrop-blur-ls rounded drop-shadow-lg py-4 mb-5">
-            <Sunset /> <span className="mt-2">{getSunTime(data.sunset)}</span>
+          <div className="days">
+            {w.daily.time.map((time, i) => (
+              <div className="day" key={time}>
+                <strong>
+                  {i === 0 ? 'Today' : formatDay(time, w.timezone)}
+                </strong>
+                <span
+                  className="day-icon"
+                  title={weatherLabel(w.daily.weather_code[i])}
+                >
+                  <WeatherIcon code={w.daily.weather_code[i]} size={21} />
+                  <span className="sr-only">
+                    {weatherLabel(w.daily.weather_code[i])}
+                  </span>
+                </span>
+                <small className="day-rain">
+                  {w.daily.precipitation_probability_max[i]}%
+                </small>
+                <span className="low">{temperature(lows[i], unit)}°</span>
+                <div className="range">
+                  <span
+                    style={{
+                      left: `${((lows[i] - min) / range) * 100}%`,
+                      width: `${Math.max(((highs[i] - lows[i]) / range) * 100, 2)}%`,
+                    }}
+                  />
+                </div>
+                <span className="high">{temperature(highs[i], unit)}°</span>
+              </div>
+            ))}
           </div>
-          <Tile
-            icon="wind"
-            title="Wind"
-            info={`${Math.round(today.wind.speed)} km/h`}
-            description={`${getWindDirection(
-              Math.round(today.wind.deg)
-            )}, gusts 
-            ${today.wind.gust.toFixed(1)} km/h`}
-          />
-          <Tile
-            icon="feels"
-            title="Feels like"
-            info={<Degree temp={Math.round(today.main.feels_like)} />}
-            description={`Feels ${
-              Math.round(today.main.feels_like) < Math.round(today.main.temp)
-                ? 'colder'
-                : 'warmer'
-            }`}
-          />
-          <Tile
-            icon="humidity"
-            title="Humidity"
-            info={`${today.main.humidity} %`}
-            description={getHumidityValue(today.main.humidity)}
-          />
-          <Tile
-            icon="pop"
-            title="Precipitation"
-            info={`${Math.round(today.pop * 100)}%`}
-            description={`${getPrecipitation(today.pop)}, clouds at ${
-              today.clouds.all
-            }%`}
-          />
-          <Tile
-            icon="pressure"
-            title="Pressure"
-            info={`${today.main.pressure} hPa`}
-            description={`${
-              Math.round(today.main.pressure) < 1013 ? 'Lower' : 'Higher'
-            } than standard`}
-          />
-          <Tile
-            icon="visibility"
-            title="Visibility"
-            info={`${(today.visibility / 1000).toFixed()} km`}
-            description={'visibility'}
-          />
         </section>
       </div>
-    </div>
+      <div className="bottom-grid">
+        <section className="panel daylight">
+          <div className="section-heading">
+            <h2>A little daylight</h2>
+            <Sun size={18} />
+          </div>
+          <div className="sun-times">
+            <div>
+              <Sunrise size={26} />
+              <small>Sunrise</small>
+              <strong>{formatTime(w.daily.sunrise[0], w.timezone)}</strong>
+            </div>
+            <div className="sun-arc" aria-hidden="true">
+              <span>☀</span>
+            </div>
+            <div>
+              <Sunset size={26} />
+              <small>Sunset</small>
+              <strong>{formatTime(w.daily.sunset[0], w.timezone)}</strong>
+            </div>
+          </div>
+          <p>
+            {Math.floor((w.daily.sunset[0] - w.daily.sunrise[0]) / 3600)}h{' '}
+            {Math.floor(((w.daily.sunset[0] - w.daily.sunrise[0]) % 3600) / 60)}
+            m of daylight today
+          </p>
+        </section>
+        <section className="outdoor-card">
+          <span className="eyebrow">
+            <Clock3 size={15} /> MAKE ROOM FOR OUTSIDE
+          </span>
+          <h2>
+            {window
+              ? 'A good moment to step out.'
+              : 'A little planning goes a long way.'}
+          </h2>
+          <p>
+            {window
+              ? `Around ${formatTime(window.time, w.timezone)}, expect ${weatherLabel(window.code).toLowerCase()}, ${temperature(window.temp, unit)}°${unit} and a ${window.rain}% chance of rain.`
+              : 'No mild, mostly dry daylight hour in the next 12 hours. Check the hourly forecast before heading out.'}
+          </p>
+          <span className="outdoor-detail">
+            Based on temperature, daylight & rain <ArrowUpRight size={17} />
+          </span>
+        </section>
+      </div>
+    </>
   )
 }
-
-export default Forecast
