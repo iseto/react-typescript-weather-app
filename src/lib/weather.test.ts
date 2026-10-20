@@ -55,6 +55,13 @@ describe('weather domain', () => {
       })
     ).toBeUndefined()
   })
+  it('never recommends an outdoor hour that has passed on the device clock', () => {
+    const now = fixture.hourly.time[3] + 60
+    expect(outdoorWindow(fixture, now)?.time).toBeGreaterThanOrEqual(now)
+    expect(
+      outdoorWindow(fixture, fixture.hourly.time[47] + 3600)
+    ).toBeUndefined()
+  })
   it('labels rain, snow, and thunderstorms distinctly', () => {
     expect(weatherLabel(65)).toBe('Rainy')
     expect(weatherLabel(75)).toBe('Snowy')

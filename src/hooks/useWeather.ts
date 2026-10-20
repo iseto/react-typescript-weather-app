@@ -1,14 +1,15 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useReducer, useRef, useCallback } from 'react'
 import {
   BERLIN,
   fetchWeather,
   isPlace,
   placeKey,
   type Place,
-  type Snapshot,
 } from '../lib/weather'
 import { readStorage, readSnapshot, writeStorage } from '../lib/storage'
 import { fetchIPPlace } from '../lib/location'
+import { createForecastState, forecastReducer } from '../lib/forecastState'
+
 function initialPlace(): Place | null {
   const params = new URLSearchParams(window.location.search)
   const lat = params.get('lat'),
@@ -26,94 +27,111 @@ function initialPlace(): Place | null {
   return isPlace(value) ? value : null
 }
 export function useWeather() {
-  const [initial] = useState(initialPlace)
-  const [place, changePlace] = useState(initial ?? BERLIN)
-  const [detecting, setDetecting] = useState(!initial && navigator.onLine)
-  const [locationHint, setLocationHint] = useState('')
-  const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
-    readSnapshot(place)
-  )
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [cached, setCached] = useState(!!snapshot)
-  const [revision, setRevision] = useState(0)
+  const [state, dispatch] = useReducer(forecastReducer, undefined, () => {
+    const initial = initialPlace()
+    const place = initial ?? BERLIN
+    return createForecastState(
+      place,
+      readSnapshot(place),
+      navigator.onLine,
+      !initial
+    )
+  })
+  const active = useRef<AbortController | null>(null)
+  const connectionState = useRef(state.online)
+  const cancel = useCallback(() => {
+    active.current?.abort()
+    active.current = null
+  }, [])
   const refresh = useCallback(() => {
-    setLoading(true)
-    setError('')
-    setRevision((r) => r + 1)
-  }, [])
-  const setPlace = useCallback((next: Place) => {
-    const stored = readSnapshot(next)
-    changePlace(next)
-    setSnapshot(stored)
-    setCached(!!stored)
-    setLoading(true)
-    setError('')
-    setDetecting(false)
-    setLocationHint('')
-    setRevision((r) => r + 1)
-    writeStorage('atmos-last-place', next)
-  }, [])
+    cancel()
+    dispatch({ type: 'refresh' })
+  }, [cancel])
+  const setPlace = useCallback(
+    (place: Place) => {
+      // Invalidate before React renders, including promises already queued to settle.
+      cancel()
+      dispatch({ type: 'select', place, snapshot: readSnapshot(place) })
+      writeStorage('atmos-last-place', place)
+    },
+    [cancel]
+  )
+  const { phase, place, requestId } = state
   useEffect(() => {
-    if (!detecting) return
+    if (!['locating', 'loading', 'refreshing'].includes(phase)) return
     const controller = new AbortController()
-    fetchIPPlace(controller.signal)
-      .then((next) => {
-        if (!controller.signal.aborted) setPlace(next)
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setDetecting(false)
-          setLocationHint(
-            'Couldn’t estimate your city. Showing Berlin — search for another place anytime.'
+    active.current = controller
+    const timer =
+      phase === 'locating'
+        ? undefined
+        : setTimeout(() => {
+            if (!controller.signal.aborted) {
+              dispatch({
+                type: 'failure',
+                requestId,
+                message: 'The forecast request timed out. Please try again.',
+              })
+              controller.abort()
+            }
+          }, 12000)
+    if (phase === 'locating') {
+      fetchIPPlace(controller.signal)
+        .then((next) => {
+          if (!controller.signal.aborted) setPlace(next)
+        })
+        .catch(() => {
+          if (!controller.signal.aborted)
+            dispatch({ type: 'location-failed', requestId })
+        })
+    } else {
+      fetchWeather(place, controller.signal)
+        .then((weather) => {
+          if (controller.signal.aborted) return
+          const snapshot = { place, weather, updatedAt: Date.now() }
+          const persisted = writeStorage(
+            `atmos-weather-${placeKey(place)}`,
+            snapshot
           )
-        }
-      })
-    return () => controller.abort()
-  }, [detecting, setPlace])
+          dispatch({ type: 'success', requestId, snapshot, persisted })
+        })
+        .catch((e) => {
+          if (!controller.signal.aborted)
+            dispatch({
+              type: 'failure',
+              requestId,
+              message:
+                e instanceof Error
+                  ? e.message
+                  : 'Unable to load weather. Please try again.',
+            })
+        })
+    }
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [phase, place, requestId, setPlace])
   useEffect(() => {
-    if (detecting) return
-    const controller = new AbortController()
-    const stored = readSnapshot(place)
-    fetchWeather(place, controller.signal)
-      .then((weather) => {
-        if (controller.signal.aborted) return
-        const next = { place, weather, updatedAt: Date.now() }
-        setSnapshot(next)
-        setCached(false)
-        writeStorage(`atmos-weather-${placeKey(place)}`, next)
-        writeStorage('atmos-last-place', place)
-      })
-      .catch((e) => {
-        if (!controller.signal.aborted) {
-          setCached(!!stored)
-          setError(
-            stored
-              ? 'Couldn’t refresh. Showing your last saved forecast.'
-              : e instanceof Error
-                ? e.message
-                : 'Unable to load weather. Please try again.'
-          )
-        }
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
-      })
-    return () => controller.abort()
-  }, [place, revision, detecting])
-  useEffect(() => {
-    window.addEventListener('online', refresh)
-    return () => window.removeEventListener('online', refresh)
-  }, [refresh])
+    const connection = () => {
+      if (connectionState.current === navigator.onLine) return
+      connectionState.current = navigator.onLine
+      cancel()
+      dispatch({ type: 'connection', online: navigator.onLine })
+    }
+    window.addEventListener('online', connection)
+    window.addEventListener('offline', connection)
+    return () => {
+      window.removeEventListener('online', connection)
+      window.removeEventListener('offline', connection)
+    }
+  }, [cancel])
+  const loading = ['locating', 'loading', 'refreshing'].includes(state.phase)
   return {
-    place,
+    ...state,
     setPlace,
-    snapshot,
-    loading,
-    error,
-    cached,
     refresh,
-    detecting,
-    locationHint,
+    loading,
+    detecting: state.phase === 'locating',
+    cached: !!state.snapshot && state.phase !== 'ready' && state.persisted,
   }
 }

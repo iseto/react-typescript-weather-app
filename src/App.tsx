@@ -21,16 +21,11 @@ import {
 } from 'lucide-react'
 import { PlaceSearch } from './components/PlaceSearch'
 import { Forecast } from './components/Forecast'
+import { ForecastStatus } from './components/ForecastStatus'
 import { WeatherIcon } from './components/WeatherIcon'
 import { useWeather } from './hooks/useWeather'
 import { usePWA } from './hooks/usePWA'
-import {
-  formatTime,
-  placeKey,
-  temperature,
-  weatherLabel,
-  type Place,
-} from './lib/weather'
+import { placeKey, temperature, weatherLabel, type Place } from './lib/weather'
 import { readPlaces, readStorage, writeStorage } from './lib/storage'
 import { fetchIPPlace } from './lib/location'
 
@@ -45,6 +40,8 @@ export default function App() {
     refresh,
     detecting,
     locationHint,
+    phase,
+    persisted,
   } = useWeather()
   const pwa = usePWA()
   const [unit, setUnit] = useState<'C' | 'F'>(() =>
@@ -270,11 +267,13 @@ export default function App() {
             <span>
               {!pwa.online
                 ? snapshot
-                  ? 'You’re offline. Your last saved forecast is available below.'
-                  : 'You’re offline. Search needs a connection; try a previously loaded place.'
+                  ? persisted
+                    ? 'You’re offline. Your last saved forecast is available below.'
+                    : 'You’re offline. Showing the forecast kept in this view; it is not saved on this device.'
+                  : 'You’re offline. No forecast saved for this city. Choose a saved place or reconnect.'
                 : error}
             </span>
-            <button disabled={loading} onClick={refresh}>
+            <button disabled={loading || !pwa.online} onClick={refresh}>
               Retry
             </button>
           </div>
@@ -290,21 +289,27 @@ export default function App() {
           <section
             className="current-card"
             aria-label="Current weather"
-            aria-busy={loading}
+            aria-busy={loading && !snapshot}
           >
             <div className="current-top">
               <span className="eyebrow">
                 <span className="live-dot" />
-                {cached
-                  ? 'SAVED FORECAST'
-                  : loading
-                    ? 'GETTING THE FORECAST'
-                    : 'RIGHT HERE, RIGHT NOW'}
+                {phase === 'refreshing'
+                  ? 'REFRESHING FORECAST'
+                  : cached
+                    ? 'SAVED FORECAST'
+                    : loading
+                      ? 'GETTING THE FORECAST'
+                      : snapshot
+                        ? phase === 'cached' || phase === 'offline'
+                          ? 'PREVIOUS FORECAST'
+                          : 'LATEST FETCH'
+                        : 'FORECAST UNAVAILABLE'}
               </span>
               <div className="current-actions">
                 <button
                   className="icon-button"
-                  disabled={loading}
+                  disabled={loading || !pwa.online}
                   onClick={refresh}
                   aria-label="Refresh forecast"
                 >
@@ -313,6 +318,7 @@ export default function App() {
                 <button
                   className="icon-button"
                   onClick={savePlace}
+                  disabled={detecting}
                   aria-label={saved ? 'Remove saved place' : 'Save place'}
                   aria-pressed={saved}
                 >
@@ -335,7 +341,9 @@ export default function App() {
                   <MapPin size={18} />
                 </h2>
                 <p className="country">
-                  {place.country}
+                  {detecting
+                    ? 'Using an approximate IP-based city'
+                    : place.country}
                   {place.source === 'ip' && ' · Approximate city (IP)'}
                 </p>
                 {w ? (
@@ -366,12 +374,16 @@ export default function App() {
                         ? detecting
                           ? 'Finding a forecast near you.'
                           : 'A fresh forecast is on its way.'
-                        : 'Let’s try that again.'}
+                        : !pwa.online
+                          ? 'No saved forecast here.'
+                          : 'Let’s try that again.'}
                     </h3>
                     <p>
                       {loading
                         ? 'Taking a quick look at the skies.'
-                        : 'Refresh or choose another place.'}
+                        : !pwa.online
+                          ? 'Choose a saved place or reconnect.'
+                          : 'Refresh or choose another place.'}
                     </p>
                   </div>
                 )}
@@ -392,11 +404,11 @@ export default function App() {
               </div>
             </div>
             <div className="current-footer">
-              <span>
-                {snapshot
-                  ? `${cached ? 'Saved' : 'Updated'} ${new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: w?.timezone }).format(snapshot.updatedAt)} · ${w ? formatTime(w.current.time, w.timezone) : ''} local time`
-                  : 'Live weather from Open-Meteo'}
-              </span>
+              <ForecastStatus
+                phase={phase}
+                snapshot={snapshot}
+                persisted={persisted}
+              />
               <span>°{unit}</span>
             </div>
           </section>
@@ -448,7 +460,7 @@ export default function App() {
           <section className="panel empty-panel">
             <h2>No forecast yet</h2>
             <p>Check your connection, then refresh or search for a city.</p>
-            <button className="button" onClick={refresh}>
+            <button className="button" disabled={!pwa.online} onClick={refresh}>
               <RefreshCw size={16} /> Try again
             </button>
           </section>
@@ -551,14 +563,16 @@ export default function App() {
             <h3>Your places stay on your device</h3>
             <p>
               On your first visit, or if device location is unavailable,
-              ipwho.is estimates your city from your IP address. This is
-              approximate and may reflect a VPN or network location. Your IP is
-              visible to that provider; Atmos does not store it.
+              ipwho.is estimates your city from your IP address without a
+              browser permission prompt. This is approximate and may reflect a
+              VPN or network location. Your IP is visible to that provider;
+              Atmos does not store it.
             </p>
             <p>
               No account needed. Saved places and preferences live in your
-              browser. Location is requested only when you tap “Use my location”
-              and coordinates are sent to Open-Meteo to retrieve weather.
+              browser. Precise device location is requested only when you tap
+              “Use my location” and coordinates are sent to Open-Meteo to
+              retrieve weather.
             </p>
           </div>
         </div>

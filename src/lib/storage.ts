@@ -34,7 +34,9 @@ export function readSnapshot(place: Place): Snapshot | null {
     isPlace(value.place) &&
     placeKey(value.place) === placeKey(place) &&
     isWeather(value.weather) &&
-    Number.isFinite(value.updatedAt)
+    Number.isFinite(value.updatedAt) &&
+    value.updatedAt > 0 &&
+    value.updatedAt <= Date.now() + 5 * 60_000
     ? value
     : null
 }

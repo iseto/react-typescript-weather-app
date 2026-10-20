@@ -35,3 +35,28 @@ export const fixture: Weather = {
     uv_index_max: [3.2, 3, 2, 3, 4, 2, 1],
   },
 }
+
+const autumnStart = Date.parse('2026-10-25T00:00:00Z') / 1000
+export const autumnFixture: Weather = {
+  ...fixture,
+  current: { ...fixture.current, time: autumnStart },
+  hourly: {
+    ...fixture.hourly,
+    time: fixture.hourly.time.map((_, i) => autumnStart + i * 3600),
+  },
+  daily: {
+    ...fixture.daily,
+    // Midnight shifts from UTC+2 to UTC+1 after the 25th.
+    time: fixture.daily.time.map((_, i) =>
+      i === 0
+        ? Date.parse('2026-10-25T00:00:00+02:00') / 1000
+        : Date.UTC(2026, 9, 25 + i, 0) / 1000 - 3600
+    ),
+    sunrise: fixture.daily.time.map(
+      (_, i) => Date.UTC(2026, 9, 25 + i, 6) / 1000
+    ),
+    sunset: fixture.daily.time.map(
+      (_, i) => Date.UTC(2026, 9, 25 + i, 16) / 1000
+    ),
+  },
+}

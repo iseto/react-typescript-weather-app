@@ -18,6 +18,8 @@ import {
   type Weather,
 } from '../lib/weather'
 import { WeatherIcon } from './WeatherIcon'
+import { useMinuteClock } from '../hooks/useMinuteClock'
+import { formatOffset, formatTimestamp } from '../lib/forecastTime'
 export function Forecast({
   weather: w,
   unit,
@@ -26,7 +28,10 @@ export function Forecast({
   unit: 'C' | 'F'
 }) {
   const hours = upcomingHours(w)
-  const window = outdoorWindow(w)
+  const hourLabels = hours.map((h) => formatTime(h.time, w.timezone))
+  const now = useMinuteClock()
+  const expired = now >= (w.hourly.time[w.hourly.time.length - 1] + 3600) * 1000
+  const window = outdoorWindow(w, now / 1000)
   const lows = w.daily.temperature_2m_min
   const highs = w.daily.temperature_2m_max
   const min = Math.min(...lows),
@@ -100,7 +105,7 @@ export function Forecast({
         <section className="panel hourly">
           <div className="section-heading">
             <h2>The next 24 hours</h2>
-            <span>Local time</span>
+            <span>From forecast time</span>
           </div>
           <div
             className="hourly-scroll"
@@ -110,8 +115,16 @@ export function Forecast({
             <div className="hourly-columns">
               {hours.map((h, i) => (
                 <div className={`hour ${i === 0 ? 'now' : ''}`} key={h.time}>
-                  <span>
-                    {i === 0 ? 'Now' : formatTime(h.time, w.timezone)}
+                  <span title={formatTimestamp(h.time * 1000, w.timezone)}>
+                    <time dateTime={new Date(h.time * 1000).toISOString()}>
+                      {hourLabels[i]}
+                    </time>
+                    {hourLabels.indexOf(hourLabels[i]) !==
+                      hourLabels.lastIndexOf(hourLabels[i]) && (
+                      <small className="hour-offset">
+                        {formatOffset(h.time, w.timezone)}
+                      </small>
+                    )}
                   </span>
                   <WeatherIcon code={h.code} day={h.day} />
                   <strong>{temperature(h.temp, unit)}°</strong>
@@ -176,9 +189,7 @@ export function Forecast({
           <div className="days">
             {w.daily.time.map((time, i) => (
               <div className="day" key={time}>
-                <strong>
-                  {i === 0 ? 'Today' : formatDay(time, w.timezone)}
-                </strong>
+                <strong>{formatDay(time, w.timezone)}</strong>
                 <span
                   className="day-icon"
                   title={weatherLabel(w.daily.weather_code[i])}
@@ -230,7 +241,7 @@ export function Forecast({
           <p>
             {Math.floor((w.daily.sunset[0] - w.daily.sunrise[0]) / 3600)}h{' '}
             {Math.floor(((w.daily.sunset[0] - w.daily.sunrise[0]) % 3600) / 60)}
-            m of daylight today
+            m of daylight in this forecast day
           </p>
         </section>
         <section className="outdoor-card">
@@ -238,14 +249,18 @@ export function Forecast({
             <Clock3 size={15} /> MAKE ROOM FOR OUTSIDE
           </span>
           <h2>
-            {window
-              ? 'A good moment to step out.'
-              : 'A little planning goes a long way.'}
+            {expired
+              ? 'A fresh forecast is needed.'
+              : window
+                ? 'A good moment to step out.'
+                : 'A little planning goes a long way.'}
           </h2>
           <p>
-            {window
-              ? `Around ${formatTime(window.time, w.timezone)}, expect ${weatherLabel(window.code).toLowerCase()}, ${temperature(window.temp, unit)}°${unit} and a ${window.rain}% chance of rain.`
-              : 'No mild, mostly dry daylight hour in the next 12 hours. Check the hourly forecast before heading out.'}
+            {expired
+              ? 'This forecast period has ended. Reconnect and refresh before planning time outside.'
+              : window
+                ? `Around ${formatTime(window.time, w.timezone)}, expect ${weatherLabel(window.code).toLowerCase()}, ${temperature(window.temp, unit)}°${unit} and a ${window.rain}% chance of rain.`
+                : 'No mild, mostly dry daylight hour in the next 12 hours. Check the hourly forecast before heading out.'}
           </p>
           <span className="outdoor-detail">
             Based on temperature, daylight & rain <ArrowUpRight size={17} />

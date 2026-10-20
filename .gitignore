@@ -46,3 +46,6 @@ coverage/
 
 # Generated dependency audit reports and local notification baseline
 /reports/
+
+# Generated demonstration recordings
+/artifacts/
