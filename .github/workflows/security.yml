@@ -22,7 +22,7 @@ jobs:
       - name: Verify audit reporting
         run: node --test scripts/security-audit-summary.test.mjs
       - name: Restore previous audit findings
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: reports/security-baseline.json
           key: full-audit-v1-${{ github.run_id }}-${{ github.run_attempt }}
@@ -37,7 +37,7 @@ jobs:
         id: report
         run: node scripts/security-audit-summary.mjs
       - name: Save current findings for the next run
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: reports/security-baseline.json
           key: full-audit-v1-${{ github.run_id }}-${{ github.run_attempt }}
