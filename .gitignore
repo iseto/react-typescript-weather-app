@@ -43,3 +43,6 @@ coverage/
 
 # Vercel project links and local deployment configuration
 .vercel/
+
+# Generated dependency audit reports and local notification baseline
+/reports/

@@ -56,3 +56,8 @@ Browser tests run against the production preview with deterministic API fixtures
 ## Stack
 
 React 19 · TypeScript 6 · Vite 8 · Lucide icons · CSS · Workbox / vite-plugin-pwa · ESLint flat config · Vitest · Playwright.
+
+## Automated dependency maintenance
+
+Weekly Dependabot updates and daily full dependency audits are configured.
+See [automation schedules and notification behavior](docs/AUTOMATIONS.md).

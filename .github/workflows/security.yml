@@ -1,0 +1,57 @@
+name: Daily full dependency audit
+on:
+  schedule:
+    - cron: "23 6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: full-dependency-audit-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  audit:
+    # Keep the notification baseline on the default branch, including manual runs.
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify audit reporting
+        run: node --test scripts/security-audit-summary.test.mjs
+      - name: Restore previous audit findings
+        uses: actions/cache/restore@v4
+        with:
+          path: reports/security-baseline.json
+          key: full-audit-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: full-audit-v1-
+      - name: Audit production and development dependencies
+        run: |
+          mkdir -p reports
+          status=0
+          npm audit --include=dev --json > reports/security-audit.json || status=$?
+          if [ "$status" -gt 1 ]; then exit "$status"; fi
+      - name: Compare findings and write report
+        id: report
+        run: node scripts/security-audit-summary.mjs
+      - name: Save current findings for the next run
+        uses: actions/cache/save@v4
+        with:
+          path: reports/security-baseline.json
+          key: full-audit-v1-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Retain audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-dependency-audit
+          path: |
+            reports/security-audit.json
+            reports/security-audit-summary.md
+          retention-days: 30
+      - name: Flag new or changed findings
+        if: steps.report.outputs.alert == 'true'
+        run: |
+          echo "New or changed dependency findings. Review the job summary and audit artifact."
+          exit 1
