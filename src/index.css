@@ -1621,3 +1621,49 @@ button:hover {
     scroll-behavior: auto !important;
   }
 }
+.forecast-status {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 10px;
+  line-height: 1.6;
+  color: #d0ddc7;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.forecast-status strong {
+  font-weight: 600;
+  color: #edf3df;
+}
+.forecast-status time {
+  font-variant-numeric: tabular-nums;
+}
+.forecast-status > span:last-of-type {
+  font-size: 9px;
+}
+.forecast-status .expired-forecast {
+  color: #f6dfab;
+}
+.current-footer {
+  align-items: flex-start;
+}
+.current-footer > span {
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .forecast-status {
+    font-size: 10px;
+  }
+  .current-footer {
+    gap: 5px;
+  }
+  .forecast-status > span:last-of-type {
+    font-size: 9px;
+  }
+}
+.hour .hour-offset {
+  display: block;
+  font-size: 8px;
+  margin-top: 2px;
+  color: #626f5b;
+}

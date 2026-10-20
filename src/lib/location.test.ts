@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { fetchIPPlace } from './location'
+import { fetchIPPlace, IP_LOCATION_URL } from './location'
 const response = {
   success: true,
   city: 'Lisbon',
@@ -37,6 +37,20 @@ describe('approximate IP city', () => {
       vi.fn().mockResolvedValue({ ok: true, json: async () => data })
     )
     await expect(fetchIPPlace(new AbortController().signal)).rejects.toThrow()
+  })
+  it('omits cookies and referrer when contacting the approximate-city provider', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => response })
+    vi.stubGlobal('fetch', fetch)
+    await fetchIPPlace(new AbortController().signal)
+    expect(fetch).toHaveBeenCalledWith(
+      IP_LOCATION_URL,
+      expect.objectContaining({
+        credentials: 'omit',
+        referrerPolicy: 'no-referrer',
+      })
+    )
   })
   it('handles rate limits', async () => {
     vi.stubGlobal(

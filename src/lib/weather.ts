@@ -74,7 +74,7 @@ export const formatDay = (time: number, timezone: string) =>
     weekday: 'short',
     timeZone: timezone,
   }).format(time * 1000)
-export const upcomingHours = (w: Weather) =>
+export const upcomingHours = (w: Weather, referenceTime = w.current.time) =>
   w.hourly.time
     .map((time, i) => ({
       time,
@@ -83,14 +83,14 @@ export const upcomingHours = (w: Weather) =>
       code: w.hourly.weather_code[i],
       day: w.hourly.is_day[i],
     }))
-    .filter((h) => h.time >= w.current.time - 3600)
+    .filter((h) => h.time >= referenceTime - 3600)
     .slice(0, 24)
-export const outdoorWindow = (w: Weather) =>
-  upcomingHours(w)
+export const outdoorWindow = (w: Weather, referenceTime = w.current.time) =>
+  upcomingHours(w, referenceTime)
     .slice(0, 12)
     .find(
       (h) =>
-        h.time >= w.current.time &&
+        h.time >= referenceTime &&
         h.day === 1 &&
         h.rain < 30 &&
         h.temp >= 8 &&

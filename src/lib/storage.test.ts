@@ -47,3 +47,14 @@ describe('persistent state', () => {
     expect(writeStorage('preference', 'value')).toBe(false)
   })
 })
+it.each([-1, 0, Date.now() + 86400000, 'yesterday', null])(
+  'ignores corrupt or implausible retrieval timestamps: %s',
+  (updatedAt) => {
+    writeStorage(`atmos-weather-${placeKey(BERLIN)}`, {
+      place: BERLIN,
+      weather: fixture,
+      updatedAt,
+    })
+    expect(readSnapshot(BERLIN)).toBeNull()
+  }
+)

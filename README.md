@@ -61,3 +61,7 @@ React 19 · TypeScript 6 · Vite 8 · Lucide icons · CSS · Workbox / vite-plug
 
 Weekly Dependabot updates and daily full dependency audits are configured.
 See [automation schedules and notification behavior](docs/AUTOMATIONS.md).
+
+## Trustworthy forecast state
+
+See [the state diagram, timestamp semantics, failure/privacy review, and test evidence](docs/data-state.md). Run `npm run demo:offline` after building to record the deterministic offline city-switching demo. Generated recordings live in `artifacts/offline-demo/` and are excluded from Git.
