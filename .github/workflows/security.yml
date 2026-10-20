@@ -43,7 +43,7 @@ jobs:
           key: full-audit-v1-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Retain audit evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: full-dependency-audit
           path: |
