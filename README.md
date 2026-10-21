@@ -15,6 +15,7 @@ No API key or environment variables are required. Weather and city search use [O
 
 ## Features
 
+- Today's briefing: city-local daily high/low, remaining-hour temperature trend, and precipitation periods, with unit support and explicit cached-source timestamps.
 - Current conditions, 24-hour forecast and temperature trend, seven-day temperature ranges, sunrise/sunset, humidity, wind, and daily peak UV.
 - City search with debouncing, request cancellation, keyboard navigation, loading states, and useful errors.
 - Approximate IP-based default city on first visit, with IP fallback when device location is denied or unavailable. Returning visitors keep their last selected city; shared links take priority.

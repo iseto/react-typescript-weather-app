@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   ArrowDownToLine,
-  ArrowRight,
   ArrowUpRight,
   Bookmark,
   Check,
   Cloud,
   Code2,
-  Globe2,
   LocateFixed,
   MapPin,
   Moon,
@@ -23,6 +21,7 @@ import {
 } from 'lucide-react'
 import { PlaceSearch } from './components/PlaceSearch'
 import { Forecast } from './components/Forecast'
+import { DailyBriefing } from './components/DailyBriefing'
 import { ForecastStatus } from './components/ForecastStatus'
 import { WeatherIcon } from './components/WeatherIcon'
 import { useWeather } from './hooks/useWeather'
@@ -227,26 +226,7 @@ export default function App() {
             {locationHint}
           </p>
         )}
-        <div className="intro">
-          <div>
-            <span className="eyebrow">YOUR EVERYDAY WEATHER COMPANION</span>
-            <h1>Look up. Head out.</h1>
-            <p>A clearer forecast for whatever’s ahead.</p>
-          </div>
-          <div className="date-label">
-            <Globe2 size={17} />
-            <span>
-              {w
-                ? new Intl.DateTimeFormat('en-GB', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    timeZone: w.timezone,
-                  }).format(w.current.time * 1000)
-                : 'Your next forecast awaits'}
-            </span>
-          </div>
-        </div>
+        <DailyBriefing snapshot={snapshot} phase={phase} unit={unit} />
         <div className="toolbar">
           <PlaceSearch onSelect={selectPlace} />
           <button
@@ -314,176 +294,132 @@ export default function App() {
             <button onClick={() => void pwa.update()}>Update app</button>
           </div>
         )}
-        <div className="hero-grid">
-          <section
-            className="current-card"
-            aria-label="Current weather"
-            aria-busy={loading && !snapshot}
-          >
-            <div className="current-top">
-              <span className="eyebrow">
-                <span className="live-dot" />
-                {phase === 'refreshing'
-                  ? 'REFRESHING FORECAST'
-                  : cached
-                    ? 'SAVED FORECAST'
-                    : loading
-                      ? 'GETTING THE FORECAST'
-                      : snapshot
-                        ? phase === 'cached' || phase === 'offline'
-                          ? 'PREVIOUS FORECAST'
-                          : 'LATEST FETCH'
-                        : 'FORECAST UNAVAILABLE'}
-              </span>
-              <div className="current-actions">
-                <button
-                  className="icon-button"
-                  disabled={loading || !pwa.online}
-                  onClick={refresh}
-                  aria-label="Refresh forecast"
-                >
-                  <RefreshCw size={17} className={loading ? 'spin' : ''} />
-                </button>
-                <button
-                  className="icon-button"
-                  onClick={savePlace}
-                  disabled={detecting}
-                  aria-label={saved ? 'Remove saved place' : 'Save place'}
-                  aria-pressed={saved}
-                >
-                  <Bookmark size={18} fill={saved ? 'currentColor' : 'none'} />
-                </button>
-                <button
-                  className="icon-button"
-                  disabled={!w}
-                  onClick={() => void share()}
-                  aria-label="Share forecast"
-                >
-                  <Share2 size={17} />
-                </button>
-              </div>
-            </div>
-            <div className="current-content">
-              <div className="current-copy">
-                <h2>
-                  {detecting ? 'Finding your city…' : place.name}
-                  <MapPin size={18} />
-                </h2>
-                <p className="country">
-                  {detecting
-                    ? 'Using an approximate IP-based city'
-                    : place.country}
-                  {place.source === 'ip' && ' · Approximate city (IP)'}
-                </p>
-                {w ? (
-                  <>
-                    <div className="temperature">
-                      {temperature(w.current.temperature_2m, unit)}
-                      <span>°</span>
-                    </div>
-                    <div className="condition">
-                      <WeatherIcon
-                        code={w.current.weather_code}
-                        day={w.current.is_day}
-                        size={22}
-                      />
-                      <span>{weatherLabel(w.current.weather_code)}</span>
-                    </div>
-                    <p className="high-low">
-                      High {temperature(w.daily.temperature_2m_max[0], unit)}°{' '}
-                      <span> / </span> Low{' '}
-                      {temperature(w.daily.temperature_2m_min[0], unit)}°
-                    </p>
-                  </>
-                ) : (
-                  <div className="weather-empty">
-                    <Cloud size={40} />
-                    <h3>
-                      {loading
-                        ? detecting
-                          ? 'Finding a forecast near you.'
-                          : 'A fresh forecast is on its way.'
-                        : !pwa.online
-                          ? 'No saved forecast here.'
-                          : 'Let’s try that again.'}
-                    </h3>
-                    <p>
-                      {loading
-                        ? 'Taking a quick look at the skies.'
-                        : !pwa.online
-                          ? 'Choose a saved place or reconnect.'
-                          : 'Refresh or choose another place.'}
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div
-                className={`weather-art ${w && !w.current.is_day ? 'night' : ''}`}
-                aria-hidden="true"
-              >
-                <div className="orbit orbit-one" />
-                <div className="orbit orbit-two" />
-                <div className="art-sun" />
-                <div className="art-cloud cloud-back" />
-                <div className="art-cloud cloud-front" />
-                <div className="art-horizon" />
-                <span>
-                  {w?.current.is_day === 0 ? 'AFTER HOURS' : 'A WORLD ABOVE'}
-                </span>
-              </div>
-            </div>
-            <div className="current-footer">
-              <ForecastStatus
-                phase={phase}
-                snapshot={snapshot}
-                persisted={persisted}
-              />
-              <span>°{unit}</span>
-            </div>
-          </section>
-          <aside className="pwa-card">
+        <section
+          className="current-card"
+          aria-label="Current weather"
+          aria-busy={loading && !snapshot}
+        >
+          <div className="current-top">
             <span className="eyebrow">
-              <Smartphone size={15} /> SMALL APP. MORE POSSIBILITIES.
+              <span className="live-dot" />
+              {phase === 'refreshing'
+                ? 'REFRESHING FORECAST'
+                : cached
+                  ? 'SAVED FORECAST'
+                  : loading
+                    ? 'GETTING THE FORECAST'
+                    : snapshot
+                      ? phase === 'cached' || phase === 'offline'
+                        ? 'PREVIOUS FORECAST'
+                        : 'LATEST FETCH'
+                      : 'FORECAST UNAVAILABLE'}
             </span>
-            <h2>
-              Your forecast.
-              <br />
-              Anywhere you go.
-            </h2>
-            <p>
-              A home on your screen. A forecast when the connection disappears.
-            </p>
-            <div className="pwa-features">
-              <span>
-                <Check size={15} /> Installable
-              </span>
-              <span>
-                <Check size={15} /> Offline ready
-              </span>
-              <span>
-                <Check size={15} /> No API key
-              </span>
+            <div className="current-actions">
+              <button
+                className="icon-button"
+                disabled={loading || !pwa.online}
+                onClick={refresh}
+                aria-label="Refresh forecast"
+              >
+                <RefreshCw size={17} className={loading ? 'spin' : ''} />
+              </button>
+              <button
+                className="icon-button"
+                onClick={savePlace}
+                disabled={detecting}
+                aria-label={saved ? 'Remove saved place' : 'Save place'}
+                aria-pressed={saved}
+              >
+                <Bookmark size={18} fill={saved ? 'currentColor' : 'none'} />
+              </button>
+              <button
+                className="icon-button"
+                disabled={!w}
+                onClick={() => void share()}
+                aria-label="Share forecast"
+              >
+                <Share2 size={17} />
+              </button>
             </div>
-            <button
-              className="pwa-link"
-              onClick={() => dialog.current?.showModal()}
+          </div>
+          <div className="current-content">
+            <div className="current-copy">
+              <h2>
+                {detecting ? 'Finding your city…' : place.name}
+                <MapPin size={18} />
+              </h2>
+              <p className="country">
+                {detecting
+                  ? 'Using an approximate IP-based city'
+                  : place.country}
+                {place.source === 'ip' && ' · Approximate city (IP)'}
+              </p>
+              {w ? (
+                <>
+                  <div className="temperature">
+                    {temperature(w.current.temperature_2m, unit)}
+                    <span>°</span>
+                  </div>
+                  <div className="condition">
+                    <WeatherIcon
+                      code={w.current.weather_code}
+                      day={w.current.is_day}
+                      size={22}
+                    />
+                    <span>{weatherLabel(w.current.weather_code)}</span>
+                  </div>
+                  <p className="high-low">
+                    High {temperature(w.daily.temperature_2m_max[0], unit)}°{' '}
+                    <span> / </span> Low{' '}
+                    {temperature(w.daily.temperature_2m_min[0], unit)}°
+                  </p>
+                </>
+              ) : (
+                <div className="weather-empty">
+                  <Cloud size={40} />
+                  <h3>
+                    {loading
+                      ? detecting
+                        ? 'Finding a forecast near you.'
+                        : 'A fresh forecast is on its way.'
+                      : !pwa.online
+                        ? 'No saved forecast here.'
+                        : 'Let’s try that again.'}
+                  </h3>
+                  <p>
+                    {loading
+                      ? 'Taking a quick look at the skies.'
+                      : !pwa.online
+                        ? 'Choose a saved place or reconnect.'
+                        : 'Refresh or choose another place.'}
+                  </p>
+                </div>
+              )}
+            </div>
+            <div
+              className={`weather-art ${w && !w.current.is_day ? 'night' : ''}`}
+              aria-hidden="true"
             >
-              Explore the app <ArrowRight size={18} />
-            </button>
-            <div className="pwa-art" aria-hidden="true">
-              <div className="mini-phone">
-                <span />
-                <Sun size={25} />
-                <strong>atmos.</strong>
-                <div />
-                <div />
-              </div>
-              <div className="mini-offline">
-                <WifiOff size={18} />
-              </div>
+              <div className="orbit orbit-one" />
+              <div className="orbit orbit-two" />
+              <div className="art-sun" />
+              <div className="art-cloud cloud-back" />
+              <div className="art-cloud cloud-front" />
+              <div className="art-horizon" />
+              <span>
+                {w?.current.is_day === 0 ? 'AFTER HOURS' : 'A WORLD ABOVE'}
+              </span>
             </div>
-          </aside>
-        </div>
+          </div>
+          <div className="current-footer">
+            <ForecastStatus
+              phase={phase}
+              snapshot={snapshot}
+              persisted={persisted}
+            />
+            <span>°{unit}</span>
+          </div>
+        </section>
         {w && <Forecast weather={w} unit={unit} />}
         {!w && !loading && (
           <section className="panel empty-panel">

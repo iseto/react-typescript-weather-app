@@ -151,12 +151,6 @@ button:hover {
 .install-button {
   background: transparent;
 }
-.intro {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin: 43px 0 29px;
-}
 .eyebrow {
   font-size: 9px;
   font-weight: 700;
@@ -165,25 +159,6 @@ button:hover {
   align-items: center;
   gap: 7px;
   color: var(--accent-text);
-}
-.intro h1 {
-  font-size: 42px;
-  letter-spacing: -1.8px;
-  font-weight: 650;
-  line-height: 1.2;
-  margin: 11px 0 9px;
-}
-.intro p {
-  font-size: 13px;
-  color: var(--muted);
-}
-.date-label {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  font-size: 11px;
-  color: var(--secondary);
-  margin-bottom: 3px;
 }
 .toolbar {
   display: flex;
@@ -318,11 +293,6 @@ button:hover {
 .saved-places button.selected {
   background: var(--hover);
   color: var(--accent-text);
-}
-.hero-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 18px;
 }
 .current-card {
   border-radius: 15px;
@@ -549,119 +519,6 @@ button:hover {
 .weather-art.night .art-sun {
   background: #e1e9cf;
   box-shadow: inset -28px 4px 0 #244c3c;
-}
-.pwa-card {
-  border: 1px solid var(--border);
-  border-radius: 15px;
-  background: var(--soft-surface);
-  position: relative;
-  overflow: hidden;
-  padding: 25px 23px;
-  min-height: 339px;
-}
-.pwa-card .eyebrow {
-  font-size: 7px;
-  letter-spacing: 1.05px;
-  color: var(--accent-text);
-}
-.pwa-card h2 {
-  font-size: 24px;
-  font-weight: 500;
-  line-height: 1.3;
-  letter-spacing: -0.75px;
-  margin: 20px 0 10px;
-}
-.pwa-card > p {
-  font-size: 11px;
-  color: var(--accent-text);
-  line-height: 1.7;
-  max-width: 225px;
-}
-.pwa-features {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 12px;
-  max-width: 165px;
-  margin-top: 16px;
-}
-.pwa-features span {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  font-size: 9px;
-  color: var(--accent-text);
-}
-.pwa-link {
-  position: absolute;
-  bottom: 25px;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  background: transparent;
-  padding: 0;
-  font-size: 11px;
-  font-weight: 600;
-  z-index: 1;
-}
-.pwa-art {
-  position: absolute;
-  width: 90px;
-  height: 126px;
-  right: -3px;
-  bottom: -10px;
-  transform: rotate(12deg);
-}
-.mini-phone {
-  position: absolute;
-  background: #f7f9ef;
-  border: 4px solid #d6deca;
-  border-radius: 16px;
-  width: 74px;
-  height: 124px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 7px;
-  gap: 6px;
-  box-shadow: 0 4px 8px #40543708;
-}
-.mini-phone > span {
-  width: 18px;
-  height: 3px;
-  border-radius: 5px;
-  background: #d2d9c6;
-}
-.mini-phone svg {
-  color: #789462;
-  margin-top: 7px;
-}
-.mini-phone strong {
-  font-family: 'Manrope';
-  font-size: 12px;
-  letter-spacing: -0.5px;
-}
-.mini-phone > div {
-  height: 4px;
-  background: #dfe6d5;
-  border-radius: 3px;
-  width: 40px;
-}
-.mini-phone > div:last-child {
-  width: 28px;
-}
-.mini-offline {
-  position: absolute;
-  bottom: 28px;
-  left: -17px;
-  width: 35px;
-  height: 35px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--green);
-  color: #d9e5c6;
-  transform: rotate(-12deg);
-  border: 3px solid var(--soft-surface);
 }
 .metrics {
   display: grid;
@@ -1191,9 +1048,6 @@ button:hover {
     max-width: 1280px;
     padding: 0 65px;
   }
-  .intro {
-    margin-top: 48px;
-  }
   .current-card {
     min-height: 365px;
   }
@@ -1215,9 +1069,6 @@ button:hover {
   .brand-caption {
     display: none;
   }
-  .hero-grid {
-    grid-template-columns: minmax(0, 1fr) 255px;
-  }
   .current-card {
     padding: 22px;
   }
@@ -1226,12 +1077,6 @@ button:hover {
     transform: scale(0.85);
     transform-origin: right center;
     margin-left: -45px;
-  }
-  .pwa-card {
-    padding: 23px 20px;
-  }
-  .pwa-card .eyebrow {
-    font-size: 6px;
   }
   .metrics > div {
     padding: 0 18px;
@@ -1248,9 +1093,6 @@ button:hover {
   .day-rain {
     display: none;
   }
-  .date-label {
-    font-size: 10px;
-  }
 }
 @media (max-width: 760px) {
   .app-shell {
@@ -1261,18 +1103,6 @@ button:hover {
   }
   .header-actions {
     gap: 14px;
-  }
-  .intro {
-    margin-top: 32px;
-  }
-  .intro h1 {
-    font-size: 36px;
-  }
-  .date-label {
-    display: none;
-  }
-  .hero-grid {
-    grid-template-columns: 1fr;
   }
   .current-card {
     min-height: 340px;
@@ -1285,37 +1115,6 @@ button:hover {
     transform: scale(1);
     margin-left: 0;
     margin-right: 4px;
-  }
-  .pwa-card {
-    min-height: 130px;
-    padding: 20px 24px;
-  }
-  .pwa-card h2 {
-    font-size: 18px;
-    margin: 10px 0 7px;
-    line-height: 1.3;
-  }
-  .pwa-card h2 br {
-    display: none;
-  }
-  .pwa-card > p {
-    max-width: 70%;
-    font-size: 11px;
-  }
-  .pwa-features {
-    display: none;
-  }
-  .pwa-link {
-    position: static;
-    margin-top: 13px;
-    display: inline-flex;
-  }
-  .pwa-art {
-    right: 12px;
-    bottom: 6px;
-  }
-  .pwa-card .eyebrow {
-    font-size: 7px;
   }
   .metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1403,21 +1202,6 @@ button:hover {
     padding: 0 10px;
     min-height: 37px;
     gap: 5px;
-  }
-  .intro {
-    margin: 29px 0 24px;
-  }
-  .intro .eyebrow {
-    font-size: 7px;
-    letter-spacing: 1.5px;
-  }
-  .intro h1 {
-    font-size: 33px;
-    letter-spacing: -1.3px;
-    margin-top: 12px;
-  }
-  .intro p {
-    font-size: 12px;
   }
   .toolbar {
     flex-wrap: wrap;
@@ -1507,23 +1291,6 @@ button:hover {
     font-size: 8px;
     margin-top: 0;
     line-height: 1.5;
-  }
-  .pwa-card {
-    padding: 20px;
-    min-height: 163px;
-  }
-  .pwa-card h2 {
-    font-size: 17px;
-  }
-  .pwa-card h2 br {
-    display: block;
-  }
-  .pwa-card > p {
-    max-width: 68%;
-    font-size: 10px;
-  }
-  .pwa-art {
-    right: 2px;
   }
   .metrics > div {
     padding: 19px;
@@ -1722,14 +1489,6 @@ button:hover {
   outline: 3px solid #8da36d;
   outline-offset: 3px;
 }
-:root[data-theme='dark'] .mini-phone {
-  background: var(--surface);
-  border-color: var(--border);
-}
-:root[data-theme='dark'] .mini-phone > span,
-:root[data-theme='dark'] .mini-phone > div {
-  background: #567052;
-}
 :root[data-theme='dark'] .brand-icon {
   border-color: #5e7754;
   color: #b8cf9b;
@@ -1764,5 +1523,91 @@ button:hover {
   .install-button {
     width: 37px;
     padding: 0;
+  }
+}
+.daily-briefing {
+  margin: 0 0 24px;
+  padding: 24px 26px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface);
+}
+.briefing-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+.briefing-heading h1 {
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  margin-top: 8px;
+}
+.briefing-date {
+  font-size: 11px;
+  color: var(--secondary);
+  white-space: nowrap;
+}
+.briefing-summary {
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 500;
+  color: var(--text);
+}
+.briefing-insights {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  margin-top: 15px;
+}
+.briefing-insights p {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--text);
+}
+.briefing-insights svg {
+  color: var(--accent-text);
+  margin-top: 3px;
+}
+.briefing-note {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--secondary);
+  margin-top: 15px;
+  overflow-wrap: anywhere;
+}
+.briefing-note:first-of-type {
+  margin-top: 0;
+}
+@media (max-width: 600px) {
+  .daily-briefing {
+    padding: 20px;
+  }
+  .briefing-insights {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .briefing-summary {
+    font-size: 14px;
+  }
+  .briefing-heading h1 {
+    font-size: 22px;
+  }
+  .briefing-heading .eyebrow {
+    font-size: 8px;
+    letter-spacing: 1.2px;
+  }
+}
+#forecast {
+  padding-top: 32px;
+}
+@media (max-width: 480px) {
+  #forecast {
+    padding-top: 24px;
   }
 }
