@@ -1,0 +1,9 @@
+# Appearance preferences
+
+The header offers independent **Color theme** (System / Light / Dark) and **Contrast** (System / Standard / More) controls. System is the initial preference. Explicit choices override the corresponding device preference, and returning to System resumes live device changes. The landing page translates these labels into English, German, and Indonesian.
+
+Preferences are saved locally for this site only, using separate JSON storage keys for theme and contrast. No cross-domain sharing, account, or tracking is introduced. Existing Atmos theme preferences remain compatible. Invalid values fall back to System. If saving is blocked, the choice applies for the current page visit and a status message explains that it could not be saved. Changes in another tab and cleared storage are observed. Initial HTML applies preferences before the app mounts, avoiding a theme flash on reload.
+
+More contrast strengthens text, control boundaries, and focus colors independently in either theme. Native system forced colors take precedence over website colors; the site does not disable forced color adjustment. Chromium emulation covers forced colors, but this is not a manual Windows Contrast Themes or screen reader audit, nor a claim of full WCAG conformance. Automated checks cover WCAG AA contrast on the tested screens. Browser focus, keyboard interaction, persistence and narrow-screen layouts are checked alongside the existing functional workflows.
+
+Template Studio updates its editor styling in place, preserving the editor instance and undo history. Preview styling follows appearance preferences; draft HTML and downloaded HTML retain their authored formatting and do not receive the viewing palette. Custom document colors and uploaded images are user content and may need separate accessibility review.

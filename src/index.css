@@ -1611,3 +1611,123 @@ button:hover {
     padding-top: 24px;
   }
 }
+
+:root {
+  --focus: #6b4213;
+  --control-border: #73836b;
+}
+:root[data-theme='dark'] {
+  --focus: #ffcf88;
+  --control-border: #8d9e83;
+}
+:root[data-contrast='more'] {
+  --text: #09170d;
+  --page: #ffffff;
+  --surface: #ffffff;
+  --secondary: #213d20;
+  --accent-text: #1d451b;
+  --muted: #213d20;
+  --border: #355230;
+  --hover: #e9f2e0;
+  --soft-surface: #eff6e8;
+  --notice-bg: #fff8e5;
+  --notice-border: #67501d;
+  --notice-text: #49340a;
+  --control-border: #355230;
+}
+:root[data-theme='dark'][data-contrast='more'] {
+  --text: #ffffff;
+  --page: #050c07;
+  --surface: #0d1a10;
+  --secondary: #e1f2d4;
+  --accent-text: #d3ffaf;
+  --muted: #e1f2d4;
+  --border: #c0d8ac;
+  --hover: #1b321a;
+  --soft-surface: #1b321a;
+  --notice-bg: #251e0a;
+  --notice-border: #e3c36e;
+  --notice-text: #fff0bb;
+  --control-border: #c0d8ac;
+}
+:focus-visible,
+.theme-control:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+.theme-control {
+  border-color: var(--control-border);
+  min-height: 44px;
+}
+.theme-control select {
+  min-height: 42px;
+}
+.contrast-control > span {
+  font-size: 12px;
+}
+.contrast-control select {
+  max-width: none;
+}
+.site-header {
+  min-height: 100px;
+  height: auto;
+  padding-block: 16px;
+  flex-wrap: wrap;
+}
+.header-actions {
+  flex-wrap: wrap;
+}
+@media (max-width: 700px) {
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .contrast-control {
+    flex: 1;
+  }
+  .theme-control select {
+    min-height: 42px;
+  }
+  .theme-control {
+    min-height: 44px;
+  }
+}
+@media (forced-colors: active) {
+  :focus-visible,
+  .theme-control:focus-within {
+    outline: 3px solid Highlight;
+  }
+  .current-card,
+  .theme-control,
+  .button,
+  .hour,
+  .day,
+  .saved-places button {
+    border: 1px solid CanvasText;
+  }
+  .current-card,
+  .install-dialog {
+    background: Canvas;
+    color: CanvasText;
+  }
+  .saved-places button.selected {
+    outline: 2px solid Highlight;
+  }
+  .temperature-chart {
+    border: 1px solid CanvasText;
+  }
+}
+
+:root[data-contrast='more'] .current-card {
+  background: #102b1a;
+}
+:root[data-contrast='more']
+  :is(
+    .metric-label svg,
+    .hour svg,
+    .day-icon,
+    .sun-times svg,
+    .capability > svg
+  ) {
+  color: var(--accent-text);
+}
