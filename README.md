@@ -67,3 +67,7 @@ See [automation schedules and notification behavior](docs/AUTOMATIONS.md).
 ## Trustworthy forecast state
 
 See [the state diagram, timestamp semantics, failure/privacy review, and test evidence](docs/data-state.md). Run `npm run demo:offline` after building to record the deterministic offline city-switching demo. Generated recordings live in `artifacts/offline-demo/` and are excluded from Git.
+
+## Portfolio listing
+
+`portfolio.json` supplies the title, technology tags, and English/German/Indonesian descriptions for [the portfolio landing page](https://github.com/iseto/portfolio-landing). Update it when shipping user-facing features. The landing page checks this file and the repository homepage hourly, validates all three translations and live links, and publishes verified changes automatically. Set the GitHub repository website to the canonical deployed demo URL. Screenshots and case-study evidence are maintained separately.
