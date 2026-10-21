@@ -5,7 +5,25 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#244c3c" />
+    <meta name="theme-color" content="#f6f7f2" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      // Resolve appearance before styles paint, including an offline reload.
+      let preference = 'system'
+      try {
+        preference = JSON.parse(localStorage.getItem('atmos-theme'))
+      } catch {}
+      const theme =
+        preference === 'light' || preference === 'dark'
+          ? preference
+          : matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light'
+      document.documentElement.dataset.theme = theme
+      document.documentElement.style.colorScheme = theme
+      document.querySelector('meta[name="theme-color"]').content =
+        theme === 'dark' ? '#121b17' : '#f6f7f2'
+    </script>
     <meta
       name="description"
       content="Weather, thoughtfully. A minimalist weather app with hourly forecasts, saved places, and offline access."

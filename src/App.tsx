@@ -10,6 +10,8 @@ import {
   Globe2,
   LocateFixed,
   MapPin,
+  Moon,
+  Monitor,
   RefreshCw,
   Share2,
   ShieldCheck,
@@ -25,6 +27,7 @@ import { ForecastStatus } from './components/ForecastStatus'
 import { WeatherIcon } from './components/WeatherIcon'
 import { useWeather } from './hooks/useWeather'
 import { usePWA } from './hooks/usePWA'
+import { useTheme, type ThemePreference } from './hooks/useTheme'
 import { placeKey, temperature, weatherLabel, type Place } from './lib/weather'
 import { readPlaces, readStorage, writeStorage } from './lib/storage'
 import { fetchIPPlace } from './lib/location'
@@ -44,6 +47,7 @@ export default function App() {
     persisted,
   } = useWeather()
   const pwa = usePWA()
+  const { preference, changeTheme } = useTheme()
   const [unit, setUnit] = useState<'C' | 'F'>(() =>
     readStorage<unknown>('atmos-unit', 'C') === 'F' ? 'F' : 'C'
   )
@@ -183,8 +187,33 @@ export default function App() {
             {pwa.online ? <Wifi size={14} /> : <WifiOff size={14} />}
             {pwa.online ? 'Connected' : 'Offline'}
           </span>
+          <label className="theme-control">
+            {preference === 'system' ? (
+              <Monitor size={16} aria-hidden="true" />
+            ) : preference === 'dark' ? (
+              <Moon size={16} aria-hidden="true" />
+            ) : (
+              <Sun size={16} aria-hidden="true" />
+            )}
+            <span className="sr-only">Color theme</span>
+            <select
+              aria-label="Color theme"
+              value={preference}
+              onChange={(event) => {
+                if (!changeTheme(event.target.value as ThemePreference))
+                  setNotice(
+                    'Theme changed for this visit. Your browser couldn’t save the preference.'
+                  )
+              }}
+            >
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
           <button
             className="button install-button"
+            aria-label={pwa.installed ? 'App details' : 'Get the app'}
             onClick={() => dialog.current?.showModal()}
           >
             <ArrowDownToLine size={16} />
