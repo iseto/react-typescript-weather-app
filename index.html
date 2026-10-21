@@ -8,21 +8,35 @@
     <meta name="theme-color" content="#f6f7f2" />
     <meta name="color-scheme" content="light dark" />
     <script>
-      // Resolve appearance before styles paint, including an offline reload.
-      let preference = 'system'
-      try {
-        preference = JSON.parse(localStorage.getItem('atmos-theme'))
-      } catch {}
-      const theme =
-        preference === 'light' || preference === 'dark'
-          ? preference
-          : matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light'
-      document.documentElement.dataset.theme = theme
-      document.documentElement.style.colorScheme = theme
+      ;(function () {
+        var p = 'atmos',
+          t,
+          c
+        try {
+          t = JSON.parse(localStorage.getItem(p + '-theme'))
+        } catch (e) {}
+        try {
+          c = JSON.parse(localStorage.getItem(p + '-contrast'))
+        } catch (e) {}
+        var r = document.documentElement
+        r.dataset.theme =
+          t === 'light' || t === 'dark'
+            ? t
+            : matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+        r.dataset.contrast =
+          c === 'standard' || c === 'more'
+            ? c
+            : matchMedia('(prefers-contrast: more)').matches
+              ? 'more'
+              : 'standard'
+        r.style.colorScheme = r.dataset.theme
+      })()
       document.querySelector('meta[name="theme-color"]').content =
-        theme === 'dark' ? '#121b17' : '#f6f7f2'
+        document.documentElement.dataset.theme === 'dark'
+          ? '#121b17'
+          : '#f6f7f2'
     </script>
     <meta
       name="description"

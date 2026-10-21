@@ -8,8 +8,8 @@
     "PWA"
   ],
   "descriptions": {
-    "en": "A weather dashboard with city-local forecasts, city search, saved places, temperature units, light/dark themes, share links, and timestamped offline forecasts.",
-    "de": "Ein Wetter-Dashboard mit ortsbezogenen Vorhersagen, Städtesuche, gespeicherten Orten, Temperatureinheiten, hellem/dunklem Design, teilbaren Links und Offline-Vorhersagen mit Zeitstempel.",
-    "id": "Dasbor cuaca dengan prakiraan waktu setempat, pencarian kota, tempat tersimpan, satuan suhu, tema terang/gelap, tautan berbagi, dan prakiraan luring bertanda waktu."
+    "en": "A weather dashboard with city-local forecasts, city search, saved places, temperature units, share links, timestamped offline forecasts, light/dark themes, and increased contrast.",
+    "de": "Ein Wetter-Dashboard mit ortsbezogenen Vorhersagen, Städtesuche, gespeicherten Orten, Temperatureinheiten, teilbaren Links, Offline-Vorhersagen mit Zeitstempel, hellem/dunklem Design und erhöhtem Kontrast.",
+    "id": "Dasbor cuaca dengan prakiraan waktu setempat, pencarian kota, tempat tersimpan, satuan suhu, tautan berbagi, prakiraan luring bertanda waktu, tema terang/gelap, dan kontras lebih tinggi."
   }
 }

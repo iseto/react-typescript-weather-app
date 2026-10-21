@@ -45,9 +45,10 @@ test('follows the device until an explicit theme is chosen and remembers it on r
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
 })
 test('applies a saved theme before React loads', async ({ page }) => {
-  await page.addInitScript(() =>
+  await page.addInitScript(() => {
     localStorage.setItem('atmos-theme', JSON.stringify('dark'))
-  )
+    localStorage.setItem('atmos-contrast', JSON.stringify('more'))
+  })
   await page.route('**/assets/index-*.js', (route) => route.abort())
   await page.goto('/')
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
@@ -144,4 +145,93 @@ test('retains the selected dark theme on a real offline service-worker reload', 
   await expect(page.getByRole('combobox', { name: 'Color theme' })).toHaveValue(
     'dark'
   )
+})
+
+for (const theme of ['light', 'dark']) {
+  test(`${theme} with increased contrast retains weather interactions and readable dialogs`, async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await expect(
+      page.getByRole('heading', { name: 'The week ahead' })
+    ).toBeVisible()
+    await page
+      .getByRole('combobox', { name: 'Color theme' })
+      .selectOption(theme)
+    await page
+      .getByRole('combobox', { name: 'Contrast', exact: true })
+      .selectOption('more')
+    await expect(page.locator('html')).toHaveAttribute('data-contrast', 'more')
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+          .analyze()
+      ).violations
+    ).toEqual([])
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .withRules(['color-contrast-enhanced'])
+          .analyze()
+      ).violations
+    ).toEqual([])
+    await page.getByRole('button', { name: 'Get the app' }).click()
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+          .analyze()
+      ).violations
+    ).toEqual([])
+    await page.keyboard.press('Escape')
+    await page.reload()
+    await expect(
+      page.getByRole('combobox', { name: 'Contrast', exact: true })
+    ).toHaveValue('more')
+    await expect(
+      page.getByRole('combobox', { name: 'Color theme' })
+    ).toHaveValue(theme)
+    for (const width of [320, 390, 1280]) {
+      await page.setViewportSize({ width, height: 900 })
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth
+        )
+      ).toBe(true)
+    }
+  })
+}
+
+test('system contrast follows device changes independently of theme and supports forced colors', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'dark', contrast: 'more' })
+  await page.goto('/')
+  await expect(page.locator('html')).toHaveAttribute('data-contrast', 'more')
+  await page
+    .getByRole('combobox', { name: 'Color theme' })
+    .selectOption('light')
+  await page.emulateMedia({ contrast: 'no-preference' })
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-contrast',
+    'standard'
+  )
+  await page
+    .getByRole('combobox', { name: 'Contrast', exact: true })
+    .selectOption('more')
+  await page.emulateMedia({ forcedColors: 'active' })
+  await expect(
+    page.getByRole('heading', { name: 'The week ahead' })
+  ).toBeVisible()
+  await page.getByRole('combobox', { name: 'Contrast', exact: true }).focus()
+  await expect(
+    page.getByRole('combobox', { name: 'Contrast', exact: true })
+  ).toBeFocused()
+  expect(
+    await page
+      .getByRole('combobox', { name: 'Contrast', exact: true })
+      .evaluate((el) => getComputedStyle(el).forcedColorAdjust)
+  ).toBe('auto')
 })

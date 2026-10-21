@@ -26,7 +26,11 @@ import { ForecastStatus } from './components/ForecastStatus'
 import { WeatherIcon } from './components/WeatherIcon'
 import { useWeather } from './hooks/useWeather'
 import { usePWA } from './hooks/usePWA'
-import { useTheme, type ThemePreference } from './hooks/useTheme'
+import {
+  useTheme,
+  type ThemePreference,
+  type ContrastPreference,
+} from './hooks/useTheme'
 import { placeKey, temperature, weatherLabel, type Place } from './lib/weather'
 import { readPlaces, readStorage, writeStorage } from './lib/storage'
 import { fetchIPPlace } from './lib/location'
@@ -46,7 +50,7 @@ export default function App() {
     persisted,
   } = useWeather()
   const pwa = usePWA()
-  const { preference, changeTheme } = useTheme()
+  const { preference, changeTheme, contrast, changeContrast } = useTheme()
   const [unit, setUnit] = useState<'C' | 'F'>(() =>
     readStorage<unknown>('atmos-unit', 'C') === 'F' ? 'F' : 'C'
   )
@@ -208,6 +212,23 @@ export default function App() {
               <option value="system">System</option>
               <option value="light">Light</option>
               <option value="dark">Dark</option>
+            </select>
+          </label>
+          <label className="theme-control contrast-control">
+            <span>Contrast</span>
+            <select
+              aria-label="Contrast"
+              value={contrast}
+              onChange={(event) => {
+                if (!changeContrast(event.target.value as ContrastPreference))
+                  setNotice(
+                    'Contrast changed for this visit. Your browser couldn’t save the preference.'
+                  )
+              }}
+            >
+              <option value="system">System</option>
+              <option value="standard">Standard</option>
+              <option value="more">More</option>
             </select>
           </label>
           <button

@@ -71,3 +71,9 @@ See [the state diagram, timestamp semantics, failure/privacy review, and test ev
 ## Portfolio listing
 
 `portfolio.json` supplies the title, technology tags, and English/German/Indonesian descriptions for [the portfolio landing page](https://github.com/iseto/portfolio-landing). Update it when shipping user-facing features. The landing page checks this file and the repository homepage hourly, validates all three translations and live links, and publishes verified changes automatically. Set the GitHub repository website to the canonical deployed demo URL. Screenshots and case-study evidence are maintained separately.
+
+## Appearance
+
+Choose System, Light or Dark and an independent System, Standard or More contrast preference in the header. Choices are remembered locally; system forced colors remain supported. See [appearance behavior and verification](docs/APPEARANCE.md).
+
+Project regression checks run on pull requests and main pushes, covering the production build and browser workflows, including appearance preferences.
