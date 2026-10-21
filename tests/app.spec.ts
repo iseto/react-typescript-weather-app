@@ -58,7 +58,9 @@ test('city search works with keyboard and keeps search available after loading',
 }) => {
   const search = page.getByRole('combobox', { name: 'Search for a city' })
   await search.fill('Lis')
-  await expect(page.getByRole('option')).toBeVisible()
+  await expect(
+    page.getByRole('listbox', { name: 'Cities' }).getByRole('option')
+  ).toBeVisible()
   await search.press('ArrowDown')
   await search.press('Enter')
   await expect(page.getByRole('heading', { name: 'Lisbon' })).toBeVisible()

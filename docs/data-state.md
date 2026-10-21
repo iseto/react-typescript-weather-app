@@ -82,3 +82,9 @@ The recording uses fixture weather and simulated connectivity, not real weather 
 - 36 unit tests pass, including state, timestamp, DST, storage, and IP-provider tests.
 - 34 browser tests pass across desktop and mobile Chromium, including automated accessibility checks.
 - The dedicated offline demonstration passes with a real service worker and simulated browser disconnection. Its weather/location values are deterministic fixtures.
+
+## Today's briefing
+
+The briefing selects the current calendar date in the forecast's IANA timezone using the device clock, rather than assuming the first cached daily row means today. It updates every minute and uses only the already-loaded daily/hourly data. A cached forecast may contain an entry for today; that entry is labeled with the original retrieval timestamp and previous-forecast status. Missing today coverage produces an unavailable message; missing remaining hourly coverage leaves only the daily range.
+
+Temperature trends compare remaining hourly values with the first remaining hour, using a 3°C threshold for warming/cooling in either unit mode. Precipitation uses the first contiguous hourly block with probability at least 50%; below 30% is described as low chance, and 30–49% as some chance. These describe hourly probabilities, not exact rain start times or guaranteed dry weather. Tomorrow's hours and finished hourly intervals are excluded. DST-crossing intervals include UTC offsets, and a period ending on the next date is labeled midnight. No yesterday comparison is generated because historical data is not requested.

@@ -15,9 +15,11 @@ No API key or environment variables are required. Weather and city search use [O
 
 ## Features
 
+- Today's briefing: city-local daily high/low, remaining-hour temperature trend, and precipitation periods, with unit support and explicit cached-source timestamps.
 - Current conditions, 24-hour forecast and temperature trend, seven-day temperature ranges, sunrise/sunset, humidity, wind, and daily peak UV.
 - City search with debouncing, request cancellation, keyboard navigation, loading states, and useful errors.
 - Approximate IP-based default city on first visit, with IP fallback when device location is denied or unavailable. Returning visitors keep their last selected city; shared links take priority.
+- Light, Dark, and System appearance, with saved preference, live system-theme updates, and theme initialization before the first paint. Theme selection also works offline; blocked storage keeps the choice for the current visit.
 - Explicit opt-in geolocation, persistent Celsius/Fahrenheit preferences, and up to eight saved places.
 - A suggested outdoor hour based on daylight, temperature (8–28°C), precipitation probability below 30%, and weather code. This is a simple forecast heuristic, not a safety recommendation.
 - Weather times and dates use the selected place’s timezone. Wind is in km/h in either temperature mode.
