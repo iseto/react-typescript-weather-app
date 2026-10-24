@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { fixture } from './fixture'
+import { mockRadar } from './radar-fixture'
 test.beforeEach(async ({ page }) => {
+  await mockRadar(page)
   await page.route('https://ipwho.is/**', (route) =>
     route.fulfill({ json: { success: false } })
   )

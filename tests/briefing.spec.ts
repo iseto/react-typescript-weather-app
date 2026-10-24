@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { fixture } from './fixture'
+import { mockRadar } from './radar-fixture'
 test.use({ timezoneId: 'Pacific/Honolulu' })
 test.beforeEach(async ({ page }) => {
+  await mockRadar(page)
   await page.clock.install({ time: new Date('2026-10-14T08:15:00Z') })
   const weather = structuredClone(fixture)
   weather.hourly.precipitation_probability = weather.hourly.time.map((_, i) =>

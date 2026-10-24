@@ -441,7 +441,9 @@ export default function App() {
             <span>°{unit}</span>
           </div>
         </section>
-        {w && <Forecast weather={w} unit={unit} />}
+        {w && (
+          <Forecast weather={w} unit={unit} place={place} online={pwa.online} />
+        )}
         {!w && !loading && (
           <section className="panel empty-panel">
             <h2>No forecast yet</h2>

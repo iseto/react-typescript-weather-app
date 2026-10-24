@@ -18,6 +18,7 @@ No API key or environment variables are required. Weather and city search use [O
 - Today's briefing: city-local daily high/low, remaining-hour temperature trend, and precipitation periods, with unit support and explicit cached-source timestamps.
 - Detailed day views with hourly conditions, temperature, precipitation probability, UV, sunrise, sunset, and daylight duration for every forecast day.
 - A 72-hour activity planner that ranks daylight windows for walking, running, cycling, and picnics using forecast temperature, precipitation, and conditions.
+- An interactive rain radar centered on the selected city, with five recent observation frames, playback controls, explicit frame times, and resilient loading/offline states.
 - Current conditions, 24-hour forecast and temperature trend, seven-day temperature ranges, sunrise/sunset, humidity, wind, and daily peak UV.
 - City search with debouncing, request cancellation, keyboard navigation, loading states, and useful errors.
 - Approximate IP-based default city on first visit, with IP fallback when device location is denied or unavailable. Returning visitors keep their last selected city; shared links take priority.

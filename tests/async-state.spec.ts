@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { fixture, autumnFixture } from './fixture'
+import { mockRadar } from './radar-fixture'
 test.use({ timezoneId: 'Pacific/Honolulu' })
 const berlin = {
   name: 'Berlin',
@@ -59,6 +60,7 @@ async function cacheBoth(page: Page) {
   await page.getByRole('button', { name: 'Save place', exact: true }).click()
 }
 test.beforeEach(async ({ page }) => {
+  await mockRadar(page)
   await page.clock.install({ time: new Date(retrieved) })
   await page.addInitScript(
     ({ berlin, tokyo }) => {

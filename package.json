@@ -16,14 +16,17 @@
     "demo:offline": "playwright test --config=playwright.demo.config.ts"
   },
   "dependencies": {
+    "leaflet": "^1.9.4",
     "lucide-react": "^1.57.0",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "react-leaflet": "^5.0.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.0",
     "@playwright/test": "^1.64.1",
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^24.0.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

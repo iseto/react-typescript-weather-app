@@ -16,6 +16,7 @@ import {
   temperature,
   upcomingHours,
   weatherLabel,
+  type Place,
   type Weather,
 } from '../lib/weather'
 import { WeatherIcon } from './WeatherIcon'
@@ -23,12 +24,17 @@ import { useMinuteClock } from '../hooks/useMinuteClock'
 import { formatOffset, formatTimestamp } from '../lib/forecastTime'
 import { DayDetailDialog } from './DayDetailDialog'
 import { ActivityPlanner } from './ActivityPlanner'
+import { RainRadar } from './RainRadar'
 export function Forecast({
   weather: w,
   unit,
+  place,
+  online,
 }: {
   weather: Weather
   unit: 'C' | 'F'
+  place: Place
+  online: boolean
 }) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const hours = upcomingHours(w)
@@ -241,6 +247,7 @@ export function Forecast({
           </div>
         </section>
       </div>
+      <RainRadar place={place} timezone={w.timezone} online={online} />
       <ActivityPlanner weather={w} unit={unit} />
       <div className="bottom-grid">
         <section className="panel daylight">
