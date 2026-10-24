@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   ArrowUpRight,
   Droplets,
@@ -20,6 +21,8 @@ import {
 import { WeatherIcon } from './WeatherIcon'
 import { useMinuteClock } from '../hooks/useMinuteClock'
 import { formatOffset, formatTimestamp } from '../lib/forecastTime'
+import { DayDetailDialog } from './DayDetailDialog'
+import { ActivityPlanner } from './ActivityPlanner'
 export function Forecast({
   weather: w,
   unit,
@@ -27,6 +30,7 @@ export function Forecast({
   weather: Weather
   unit: 'C' | 'F'
 }) {
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const hours = upcomingHours(w)
   const hourLabels = hours.map((h) => formatTime(h.time, w.timezone))
   const now = useMinuteClock()
@@ -188,7 +192,22 @@ export function Forecast({
           </div>
           <div className="days">
             {w.daily.time.map((time, i) => (
-              <div className="day" key={time}>
+              <button
+                className="day"
+                key={time}
+                type="button"
+                aria-haspopup="dialog"
+                aria-label={`View details for ${new Intl.DateTimeFormat(
+                  'en-GB',
+                  {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    timeZone: w.timezone,
+                  }
+                ).format(time * 1000)}`}
+                onClick={() => setSelectedDay(i)}
+              >
                 <strong>{formatDay(time, w.timezone)}</strong>
                 <span
                   className="day-icon"
@@ -203,20 +222,26 @@ export function Forecast({
                   {w.daily.precipitation_probability_max[i]}%
                 </small>
                 <span className="low">{temperature(lows[i], unit)}°</span>
-                <div className="range">
+                <span className="range">
                   <span
                     style={{
                       left: `${((lows[i] - min) / range) * 100}%`,
                       width: `${Math.max(((highs[i] - lows[i]) / range) * 100, 2)}%`,
                     }}
                   />
-                </div>
+                </span>
                 <span className="high">{temperature(highs[i], unit)}°</span>
-              </div>
+                <ArrowUpRight
+                  className="day-open"
+                  size={14}
+                  aria-hidden="true"
+                />
+              </button>
             ))}
           </div>
         </section>
       </div>
+      <ActivityPlanner weather={w} unit={unit} />
       <div className="bottom-grid">
         <section className="panel daylight">
           <div className="section-heading">
@@ -267,6 +292,12 @@ export function Forecast({
           </span>
         </section>
       </div>
+      <DayDetailDialog
+        weather={w}
+        day={selectedDay}
+        unit={unit}
+        onClose={() => setSelectedDay(null)}
+      />
     </>
   )
 }

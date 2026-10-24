@@ -1,0 +1,11 @@
+---
+description: Use human-readable branch names without agent-specific prefixes
+alwaysApply: true
+---
+
+# Branch naming
+
+- Never use `codex/` in a branch name.
+- Use a conventional, human-readable prefix that matches the work, such as `feature/`, `fix/`, `refactor/`, `docs/`, or `chore/`.
+- Follow the prefix with a short lowercase kebab-case description.
+- Examples: `feature/activity-planner`, `fix/offline-refresh`, and `docs/pwa-setup`.
