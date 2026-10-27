@@ -8,6 +8,10 @@ updates:
       time: "06:00"
       timezone: Europe/Berlin
     open-pull-requests-limit: 3
+    # typescript-eslint currently requires TypeScript <6.1; revisit with parser support.
+    ignore:
+      - dependency-name: typescript
+        versions: ["7.x"]
     groups:
       framework:
         patterns:
